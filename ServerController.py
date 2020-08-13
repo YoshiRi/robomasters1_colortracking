@@ -1,5 +1,3 @@
-import socket
-
 # server側
 import socket
 from contextlib import closing
