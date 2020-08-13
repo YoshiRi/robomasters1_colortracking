@@ -9,7 +9,36 @@ def get_reference(message):
     for val in vals:
         newlist.append(float(val))
     return newlist
+    
+# saturation
+def saturation(val,vmin=vmin,vmax=vmax):
+    return MIN(MAX(val,vmax),vmin)
 
+# Control Program
+def gimbal_tracking(diff):
+    # P gain
+    Kp = 5.0
+    # Control Duration[s]
+    Duration = 0.05
+    # vref
+    v_yaw = - Kp * diff[0]
+    v_pitch = - Kp * diff[1]
+    # set speed    
+    yaw_speed = saturation(int(v_yaw),300,-300)
+    pitch_speed = saturation(int(v_pitch),150,-150)
+    gimbal_ctrl.rotate_with_speed(yaw_speed, pitch_speed)
+
+    # get current gimbal
+    yaw_now = gimbal_ctrl.get_axis_angle(rm_define.gimbal_axis_yaw)
+    pitch_now = gimbal_ctrl.get_axis_angle(rm_define.gimbal_axis_pitch)
+    
+    # cobtrol
+    yaw_des = yaw_speed * Duration + yaw_now
+    pitch_des = pitch_speed * Duration + pitch_now
+    gimbal_ctrl.angle_ctrl(yaw_des, pitch_des)
+
+
+# Server with auto close
 def run_server():
     # parameter
     host = '127.0.0.1'
@@ -33,3 +62,14 @@ def run_server():
     return
 
 print("Exit!")
+
+def start():
+    # Gimbal Lead
+    robot_ctrl.set_mode(rm_define.robot_mode_chassis_follow)
+
+    # Set chasis to follow Gimbal
+    chassis_ctrl.set_follow_gimbal_offset(0)# chasis にFollow
+    chassis_ctrl.set_rotate_speed(180)
+    gimbal_ctrl.set_rotate_speed(100)  # 後で変えるので多分無意味
+    
+    run_server()
