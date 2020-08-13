@@ -4,7 +4,9 @@ from contextlib import closing
 
 # message to val
 def get_reference(message):
-    vals_= message.decode().split(',')
+    vals_ = message.decode().split(',')
+    if not vals:
+        return [0,0]
     newlist = []
     for val in vals:
         newlist.append(float(val))
@@ -41,11 +43,11 @@ def gimbal_tracking(diff):
 # Server with auto close
 def run_server():
     # parameter
-    host = '127.0.0.1'
+    host = '192.168.100.111'
     port = 8888
     backlog = 5
     buf_size = 4096
-    timeout = 60
+    timeout = 20
     #init
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(timeout)
@@ -58,10 +60,9 @@ def run_server():
                 msg = clientsocket.recv(buf_size)
                 print(msg)
                 print(get_reference(msg))
-                clientsocket.send(msg)
+                clientsocket.send(b"OK")
     return
 
-print("Exit!")
 
 def start():
     # Gimbal Lead

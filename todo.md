@@ -123,9 +123,15 @@ def run_server():
                 msg = clientsocket.recv(buf_size)
                 print(msg)
                 print(get_reference(msg))
-                clientsocket.send(msg)
+                clientsocket.send(b"OK")
     return
 
-print("Exit!")
 ```
+
+socketをつなぎっぱにすると怒られる。
+
+```
+OSError: [WinError 10038] ソケット以外のものに対して操作を実行しようとしました。
+```
+
 

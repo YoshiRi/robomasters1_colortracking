@@ -49,7 +49,7 @@ host = "192.168.100.111"
 port = 8888
 buf_size = 4096
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 # for loop
@@ -74,10 +74,12 @@ while(True):
     msg = str(bbox[0] - cx) + "," + str(cy - bbox[1])
     
     # send to server
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     with closing(sock):
         sock.connect((host, port))
-        sock.send(msg.decode())
-
+        sock.send(msg.encode())
+        rmsg = sock.recv(buf_size)  #use global
+        print(rmsg)
 
     Key = cv2.waitKey(1)
     if Key & 0xFF == ord('q'):
