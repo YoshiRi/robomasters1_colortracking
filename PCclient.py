@@ -1,6 +1,8 @@
 # クライアント側
 import socket
 from contextlib import closing
+import cv2
+import numpy as np
 
 def find_largest_redzone_rect(image,bboxsize=50):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV_FULL)
@@ -44,7 +46,7 @@ cx, cy = wid/2, hei/2
 
 # Communication
 host = "192.168.100.111"
-port = "8888"
+port = 8888
 buf_size = 4096
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

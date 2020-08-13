@@ -11,7 +11,7 @@ def get_reference(message):
     return newlist
     
 # saturation
-def saturation(val,vmin=vmin,vmax=vmax):
+def saturation(val,vmin=-360,vmax=360):
     return MIN(MAX(val,vmax),vmin)
 
 # Control Program
