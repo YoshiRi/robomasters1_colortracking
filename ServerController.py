@@ -1,18 +1,37 @@
 import socket
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# bind the socket to a public host, and a well-known port
-s.bind((socket.gethostname(), 80))
-# become a server socket
-s.listen(5)
+# server側
+import socket
+from contextlib import closing
 
-timeout=60## run 60 sec
-s.settimeout(timeout)
+# message to val
+def get_reference(message):
+    vals_= message.decode().split(',')
+    newlist = []
+    for val in vals:
+        newlist.append(float(val))
+    return newlist
 
-while True: 
-    clientsocket, address = s.accept()
-    print(f"Connection from {address} has been established!")
-    clientsocket.send(bytes("Welcome to the server!", 'utf-8'))
-    clientsocket.close()
+def run_server():
+    # parameter
+    host = '127.0.0.1'
+    port = 8888
+    backlog = 5
+    buf_size = 4096
+    timeout = 60
+    #init
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(timeout)
+    with closing(sock):
+        sock.bind((host, port))
+        sock.listen(backlog)
+        while True:
+            clientsocket, address = sock.accept()
+            with closing(clientsocket):
+                msg = clientsocket.recv(buf_size)
+                print(msg)
+                print(get_reference(msg))
+                clientsocket.send(msg)
+    return
 
 print("Exit!")
