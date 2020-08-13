@@ -14,12 +14,12 @@ def get_reference(message):
     
 # saturation
 def saturation(val,vmin=-360,vmax=360):
-    return MIN(MAX(val,vmax),vmin)
+    return min(max(val,vmin),vmax)
 
 # Control Program
 def gimbal_tracking(diff):
     # P gain
-    Kp = 5.0
+    Kp = 1.0
     # Control Duration[s]
     Duration = 0.05
     # vref
@@ -37,6 +37,8 @@ def gimbal_tracking(diff):
     # cobtrol
     yaw_des = yaw_speed * Duration + yaw_now
     pitch_des = pitch_speed * Duration + pitch_now
+    yaw_d = saturation(yaw_des,-200,200)
+    pitch_d = saturation(pitch_des,-15,30)
     gimbal_ctrl.angle_ctrl(yaw_des, pitch_des)
 
 
@@ -60,17 +62,18 @@ def run_server():
                 msg = clientsocket.recv(buf_size)
                 #print(msg)
                 print(get_reference(msg))
-                #gimbal_tracking(get_reference(msg))
+                gimbal_tracking(get_reference(msg))
                 #clientsocket.send(b"OK")
     return
 
 
 def start():
     # Gimbal Lead
-    robot_ctrl.set_mode(rm_define.robot_mode_chassis_follow)
+    #robot_ctrl.set_mode(rm_define.robot_mode_chassis_follow)
+    robot_ctrl.set_mode(rm_define.robot_mode_free)    
 
     # Set chasis to follow Gimbal
-    chassis_ctrl.set_follow_gimbal_offset(0)# chasis にFollow
+    #chassis_ctrl.set_follow_gimbal_offset(0)# chasis にFollow
     chassis_ctrl.set_rotate_speed(180)
     gimbal_ctrl.set_rotate_speed(100)  # 後で変えるので多分無意味
     

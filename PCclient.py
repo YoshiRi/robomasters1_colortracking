@@ -40,7 +40,7 @@ print("Now channel is:",chnum)
 ret, frame = cap.read()
 if not ret:
     exit(0)
-wid, hei, _= frame.shape
+hei, wid, _= frame.shape
 # image center : target
 cx, cy = wid/2, hei/2
 
@@ -66,13 +66,16 @@ while(True):
 
     # Show Track result
     cv2.imshow('tracked frame', frame_withbb)
-    print(bbox,flush=True)
+    #print(bbox,flush=True)
 
     # Create Data
     # u: yaw, v: -Pitch 
-    data = [bbox[0] - cx, cy - bbox[1]]
-    msg = str(bbox[0] - cx) + "," + str(cy - bbox[1])
-    
+    x = bbox[0] + bbox[2]/2
+    y = bbox[1] + bbox[3]/2
+    data = [cx -  x, - cy + y]
+    msg = str(cx - x) + "," + str(- cy + y)
+    print(data)
+
     # send to server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     with closing(sock):
