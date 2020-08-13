@@ -1,42 +1,86 @@
+# クライアント側
 import socket
+from contextlib import closing
 
-class ClientSocket:
-    """demonstration class only
-      - coded for clarity, not efficiency
-    """
+def find_largest_redzone_rect(image,bboxsize=50):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV_FULL)
+    h = hsv[:, :, 0]
+    s = hsv[:, :, 1]
+    mask = np.zeros(h.shape, dtype=np.uint8)
+    mask[((h < 15) | (h > 200)) & (s > 128)] = 255
+    # Get boundary
+    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    rects = []
+    
+    for contour in contours:
+        approx = cv2.convexHull(contour)
+        rect = cv2.boundingRect(approx)
+        rects.append(np.array(rect))
+    largest = max(rects, key=(lambda x: x[2] * x[3])) #return maximum rectangle
+    centerx = largest[0]+largest[2]/2 
+    centery = largest[1]+largest[3]/2
+    bbox = (centerx-bboxsize/2,centery-bboxsize/2,bboxsize,bboxsize)
+    return bbox, largest
 
-    def __init__(self, sock=None):
-        if sock is None:
-            self.sock = socket.socket(
-                            socket.AF_INET, socket.SOCK_STREAM)
-        else:
-            self.sock = sock
+def drawrect(frame,bbox,color=(0,255,0)):
+    p1 = (int(bbox[0]), int(bbox[1]))
+    p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+    cv2.rectangle(frame, p1, p2, color, 2, 1)
+    return frame
 
-    def connect(self, host, port):
-        self.sock.connect((host, port))
-
-    def mysend(self, msg):
-        totalsent = 0
-        while totalsent < MSGLEN:
-            sent = self.sock.send(msg[totalsent:])
-            if sent == 0:
-                raise RuntimeError("socket connection broken")
-            totalsent = totalsent + sent
-
-    def myreceive(self):
-        chunks = []
-        bytes_recd = 0
-        while bytes_recd < MSGLEN:
-            chunk = self.sock.recv(min(MSGLEN - bytes_recd, 2048))
-            if chunk == b'':
-                raise RuntimeError("socket connection broken")
-            chunks.append(chunk)
-            bytes_recd = bytes_recd + len(chunk)
-        return b''.join(chunks)
+# video
+chnum = 2
+cap = cv2.VideoCapture(chnum)
+print("Now channel is:",chnum)
 
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.settimeout(5)  # 5sec for timeout
+# test capture
+ret, frame = cap.read()
+if not ret:
+    exit(0)
+wid, hei, _= frame.shape
+# image center : target
+cx, cy = wid/2, hei/2
 
-address = "192.168.100.111"
+# Communication
+host = "192.168.100.111"
 port = "8888"
+buf_size = 4096
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+
+# for loop
+while(True):
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+
+    if not ret:
+        print("No video input!")
+
+    # tracker
+    bbox, largest = find_largest_redzone_rect(frame)
+    frame_withbb = drawrect(frame,bbox)
+
+    # Show Track result
+    cv2.imshow('tracked frame', frame_withbb)
+    print(bbox,flush=True)
+
+    # Create Data
+    # u: yaw, v: -Pitch 
+    data = [bbox[0] - cx, cy - bbox[1]]
+    msg = str(bbox[0] - cx) + "," + str(cy - bbox[1])
+    
+    # send to server
+    with closing(sock):
+        sock.connect((host, port))
+        sock.send(msg.decode())
+
+
+    Key = cv2.waitKey(1)
+    if Key & 0xFF == ord('q'):
+        break
+
+# When everything done, release the capture
+cap.release()
+cv2.destroyAllWindows()

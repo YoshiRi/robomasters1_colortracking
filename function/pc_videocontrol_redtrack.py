@@ -1,6 +1,4 @@
-## Video Capture
-# press p/m to increase/decrease channel number
-# press q to finish
+## Red Tracker
 
 import numpy as np
 import cv2
