@@ -106,7 +106,7 @@ def get_reference(message):
 
 def run_server():
     # parameter
-    host = '127.0.0.1'
+    host = '192.168.100.111'
     port = 8888
     backlog = 5
     buf_size = 4096

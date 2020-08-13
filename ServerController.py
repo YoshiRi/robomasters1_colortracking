@@ -4,7 +4,7 @@ from contextlib import closing
 
 # message to val
 def get_reference(message):
-    vals_ = message.decode().split(',')
+    vals = message.decode().split(',')
     if not vals:
         return [0,0]
     newlist = []
@@ -58,9 +58,10 @@ def run_server():
             clientsocket, address = sock.accept()
             with closing(clientsocket):
                 msg = clientsocket.recv(buf_size)
-                print(msg)
+                #print(msg)
                 print(get_reference(msg))
-                clientsocket.send(b"OK")
+                #gimbal_tracking(get_reference(msg))
+                #clientsocket.send(b"OK")
     return
 
 

@@ -78,8 +78,8 @@ while(True):
     with closing(sock):
         sock.connect((host, port))
         sock.send(msg.encode())
-        rmsg = sock.recv(buf_size)  #use global
-        print(rmsg)
+        #rmsg = sock.recv(buf_size)  #use global
+        #print(rmsg)
 
     Key = cv2.waitKey(1)
     if Key & 0xFF == ord('q'):
