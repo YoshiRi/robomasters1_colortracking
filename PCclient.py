@@ -3,6 +3,8 @@ import socket
 from contextlib import closing
 import cv2
 import numpy as np
+import threading
+import time
 
 def find_largest_redzone_rect(image,bboxsize=50):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV_FULL)
@@ -30,6 +32,37 @@ def drawrect(frame,bbox,color=(0,255,0)):
     cv2.rectangle(frame, p1, p2, color, 2, 1)
     return frame
 
+
+class ClientThread(threading.Thread):
+    def __init__(self, PORT=8888,HOST="192.168.100.111"):
+        threading.Thread.__init__(self)
+        self.kill_flag = False
+        # line information
+        self.HOST = HOST
+        self.PORT = PORT
+        self.BUFSIZE = 1024
+        self.ADDR = (HOST, self.PORT)
+        # tcp/udp
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def run(self):
+        while True:
+            try:
+                global msg                
+                # tcp
+                #self.sock.connect(self.ADDR)
+                #self.sock.send(msg.encode())
+                # udp
+                self.udpsock.sendto(msg.encode(), self.ADDR)
+                print("send")
+                time.sleep(0.02)
+            except:
+                pass
+                self.udpsock.close()
+                print("close")
+                self.udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                #exit()
 # video
 chnum = 2
 cap = cv2.VideoCapture(chnum)
@@ -47,10 +80,13 @@ cx, cy = wid/2, hei/2
 # Communication
 host = "192.168.100.111"
 port = 8888
-buf_size = 4096
+buf_size = 1024
 
-#sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+msg = "0,0"
 
+th = ClientThread(PORT=port,HOST=host)
+th.setDaemon(True)
+th.start()
 
 # for loop
 while(True):
@@ -75,14 +111,6 @@ while(True):
     data = [cx -  x, - cy + y]
     msg = str(cx - x) + "," + str(- cy + y)
     print(data)
-
-    # send to server
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    with closing(sock):
-        sock.connect((host, port))
-        sock.send(msg.encode())
-        #rmsg = sock.recv(buf_size)  #use global
-        #print(rmsg)
 
     Key = cv2.waitKey(1)
     if Key & 0xFF == ord('q'):

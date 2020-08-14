@@ -1,6 +1,7 @@
 # server側
 import socket
 from contextlib import closing
+import threading
 
 # message to val
 def get_reference(message):
@@ -44,28 +45,45 @@ def gimbal_tracking(diff):
     print(v_yaw,v_pitch,yaw_now,pitch_now,pitch_d,yaw_d)
 
 
+
+
 # Server with auto close
 def run_server():
     # parameter
     host = '192.168.100.111'
     port = 8888
     backlog = 5
-    buf_size = 4096
+    buf_size = 1024
     timeout = 20
     #init
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(timeout)
+    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #sock.settimeout(timeout)
+    udpServSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udpServSock.bind((host,port)) # HOST, PORTでbinding
+    udpServSock.settimeout(timeout)
+    
+    '''
     with closing(sock):
         sock.bind((host, port))
         sock.listen(backlog)
         while True:
             clientsocket, address = sock.accept()
             with closing(clientsocket):
-                msg = clientsocket.recv(buf_size)
-                #print(msg)
-                #print(get_reference(msg))
-                gimbal_tracking(get_reference(msg))
-                #clientsocket.send(b"OK")
+                while True:
+                    try:
+                        msg = clientsocket.recv(buf_size)
+                        #print(msg)
+                        #print(get_reference(msg))
+                        gimbal_tracking(get_reference(msg))
+                        #clientsocket.send(b"OK")
+                    except:
+                        print("Break")
+                        break
+    '''              
+    while True: 
+        #udp
+        data, addr = udpServSock.recvfrom(buf_size) # データ受信
+        print(data)
     return
 
 
@@ -80,3 +98,4 @@ def start():
     gimbal_ctrl.set_rotate_speed(100)  # 後で変えるので多分無意味
     
     run_server()
+    
