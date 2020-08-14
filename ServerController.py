@@ -55,8 +55,7 @@ def gimbal_tracking(diff):
     gimbal_ctrl.angle_ctrl(yaw_d, pitch_d)
     '''
     #print(v_yaw,v_pitch,yaw_now,pitch_now,pitch_d,yaw_d)
-    return str(yaw_now)+" ,"+str(pitch_now)
-
+    return str(yaw_now)+" ,"+str(pitch_now)+" ,"+str(yaw_speed)
 
 
 # Server with auto close
@@ -64,7 +63,7 @@ def run_server():
     global STOPPER
     # parameter
     host = '192.168.100.111'
-    port = 8888
+    port = 88888
     backlog = 5
     buf_size = 1024
     timeout = 20

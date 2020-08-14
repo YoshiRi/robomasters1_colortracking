@@ -34,7 +34,7 @@ def drawrect(frame,bbox,color=(0,255,0)):
 
 
 class ClientThread(threading.Thread):
-    def __init__(self, PORT=8888,HOST="192.168.100.111"):
+    def __init__(self, PORT=88888,HOST="192.168.100.111"):
         threading.Thread.__init__(self)
         self.kill_flag = False
         # line information
@@ -82,7 +82,7 @@ cx, cy = wid/2, hei/2
 
 # Communication
 host = "192.168.100.111"
-port = 8888
+port = 88888
 buf_size = 1024
 
 msg = "0,0"

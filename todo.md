@@ -55,6 +55,12 @@ gimbal_ctrl.angle_ctrl(60, 15)
 
 いや，速度制御できるわ。
 
+### バグfix
+
+- `gimbal_ctrl.rotate_with_speed(yaw_speed, pitch_speed)`は所定の通りに動かないので使わない方が良い。
+- gimbal_ctrl.rotate_with_speed(yaw_speed, pitch_speed)
+
+いや，そもそもできてない。なんか保存ができてない臭い？
 
 ## Video Capture
 
