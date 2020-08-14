@@ -53,6 +53,9 @@ gimbal_ctrl.rotate_with_speed(30, 10)
 gimbal_ctrl.angle_ctrl(60, 15)
 ```
 
+いや，速度制御できるわ。
+
+
 ## Video Capture
 
 RobomasterのVideoをCaptureする。

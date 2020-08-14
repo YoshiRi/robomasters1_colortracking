@@ -55,8 +55,11 @@ class ClientThread(threading.Thread):
                 #self.sock.send(msg.encode())
                 # udp
                 self.udpsock.sendto(msg.encode(), self.ADDR)
+                time.sleep(0.001)
                 print("send")
-                time.sleep(0.02)
+                # udp recv
+                data, addr = self.udpsock.recvfrom(self.BUFSIZE)
+                print(data)
             except:
                 pass
                 self.udpsock.close()
@@ -97,7 +100,10 @@ while(True):
         print("No video input!")
 
     # tracker
-    bbox, largest = find_largest_redzone_rect(frame)
+    try:
+        bbox, largest = find_largest_redzone_rect(frame)
+    except:
+        exit()
     frame_withbb = drawrect(frame,bbox)
 
     # Show Track result
