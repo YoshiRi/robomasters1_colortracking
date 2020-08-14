@@ -39,7 +39,9 @@ def gimbal_tracking(diff):
     pitch_des = pitch_speed * Duration + pitch_now
     yaw_d = saturation(yaw_des,-200,200)
     pitch_d = saturation(pitch_des,-15,30)
-    gimbal_ctrl.angle_ctrl(yaw_des, pitch_des)
+    gimbal_ctrl.angle_ctrl(yaw_d, pitch_d)
+    
+    print(v_yaw,v_pitch,yaw_now,pitch_now,pitch_d,yaw_d)
 
 
 # Server with auto close
@@ -61,7 +63,7 @@ def run_server():
             with closing(clientsocket):
                 msg = clientsocket.recv(buf_size)
                 #print(msg)
-                print(get_reference(msg))
+                #print(get_reference(msg))
                 gimbal_tracking(get_reference(msg))
                 #clientsocket.send(b"OK")
     return

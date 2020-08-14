@@ -9,7 +9,7 @@ def find_largest_redzone_rect(image,bboxsize=50):
     h = hsv[:, :, 0]
     s = hsv[:, :, 1]
     mask = np.zeros(h.shape, dtype=np.uint8)
-    mask[((h < 15) | (h > 200)) & (s > 128)] = 255
+    mask[((h < 10) | (h > 220)) & (s > 128)] = 255
     # Get boundary
     _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     rects = []
